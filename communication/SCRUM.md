@@ -1,6 +1,6 @@
 # Template
 
-**T:** Today - You worked on what (describe what you\'92ve been working on).
+**T:** Today - You worked on what (describe what you've been working on)
 **R:** Roadblocks -  (describe any roadblocks if any).
 **W:** Wins - (describe what you accomplished successfully).
 **%:** Estimated percentage of completion.
@@ -15,7 +15,7 @@
 
 ## W16D5
 
- **T:** Today - 
-**R:** Roadblocks -  
+**T:** Today - 
+**R:** Roadblocks - 
 **W:** Wins - 
-**%:**
+**%:** 
