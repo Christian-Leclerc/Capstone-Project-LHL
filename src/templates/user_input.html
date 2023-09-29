@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>User Input</title>
+</head>
+<body>
+
+<h1>Enter Your Preferences</h1>
+
+<!-- Your form elements here -->
+
+<button onclick="submitData()">Submit</button>
+
+<script>
+// Your JavaScript to make an AJAX call to Flask API
+function submitData() {
+    fetch('http://localhost:5000/recommend', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({/* Your payload */})
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Update Tableau sheet using Tableau JavaScript API
+    });
+}
+</script>
+
+</body>
+</html>
