@@ -279,7 +279,7 @@ def feature_engineering(df):
     df_engineered['last_year_reno'] = 0  # Initialize with zeros instead of np.nan
 
     ## Update new columns based on 'Rénovations'
-    for idx, row in df.iterrows():
+    for idx, row in df_engineered.iterrows():
         if pd.notna(row['Rénovations']):
             df_engineered.loc[idx, 'has_reno'] = 1
             years = [int(year) for year in re.findall(r'\b\d{4}\b', row['Rénovations'])]
