@@ -7,7 +7,7 @@ import subprocess # for VSCode
 import json
 import time
 
-# Environement variable
+# Environment variable
 import os
 sensitive_url = os.getenv('SENSITIVE_URL').split(',')
 
