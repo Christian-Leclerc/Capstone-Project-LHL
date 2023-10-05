@@ -89,11 +89,8 @@ def clean_data(df):
                 
         return pd.Series([has_certificate, year_certificate, due_certificate], index=['has_certificate', 'year_certificate', 'due_certificate'])
 
-    # Standardize near water names
-    standard_names = ['Fleuve St-Laurent', 'Canal de Lachine', 'Rivière des Prairies', 'Louis Veuillot', 'Municipal', 'Ville']
-
     ## Mapping of similar or translated terms to standard names
-    mapping = {
+    map_water = {
         'fleuve st-laurent': 'Fleuve St-Laurent',
         'st-lawrence river': 'Fleuve St-Laurent',
         'st-laurent river': 'Fleuve St-Laurent',
@@ -123,32 +120,106 @@ def clean_data(df):
             row_lower = row.lower()
             if row_lower != 'none':
                 near_water = 1
-                for key, value in mapping.items():
+                for key, value in map_water.items():
                     if key in row_lower:
                         water_name = value
                         break
                 
         return pd.Series([near_water, water_name], index=['near_water', 'water_name'])
     
-   
+    # Pool info
+    map_pool = {
+        'chauffée': 'Chauffée',
+        'creusée': 'Creusée', 
+        'hors terre': 'Hors-Terre',
+        'au locataire': 'Au locataire', 
+        'semi-creusée': 'Semi-creusée', 
+        'spa': 'Spa',
+        'semi hors terre': 'Hors-terre', 
+        'Étang à poisson': 'Étang à poisson',
+        'béton 30 x 16': 'Creusée', 
+        'toile 2021': 'Inconnu', 
+        'semi-creusé / sel': 'Au sel',
+        '2020': 'Inconnu',
+        'thermopompe': 'Chaufée',
+        'chauffée au mazout': 'Chauffée au mazout'
+    }
+    
+    def standardize_pool(row):
+        has_pool = 0
+        pool_type = None
+    
+        if pd.notna(row):
+            row_lower = row.lower()
+            if row_lower != 'none':
+                has_pool = 1
+                for key, value in map_pool.items():
+                    if key in row_lower:
+                        pool_type = value
+                        break
+                
+        return pd.Series([has_pool, pool_type], index=['has_pool', 'pool_type'])
+
+    # Extract total parking lot
+    def total_parking(row):
+        if pd.isna(row):
+            return 1
+        numbers = re.findall(r'\((\d+)\)', row)
+
+        return sum(int(num) for num in numbers)
+
+    # Cleaning type of heating
+    map_heating = {
+        'plinthes électriques': 'Plinthes électriques',
+        'plinthes à convection': 'Convecteurs',
+        'eau chaude': 'Eau chaude',
+        'air soufflé': 'Air soufflé (pulsé)',
+        'air soufflé (pulsé)': 'Air soufflé (pulsé)',
+        'radiant': 'Radiant',
+        'thermopom': 'Thermopompe',
+        'themo pomp mural': 'Thermopompe',
+        'gaz naturel': 'Gaz naturel',
+        'poêle à bois': 'Poêle à bois',
+        'foyer ayu gaz': 'Foyer au gaz'
+    }
+
+    # Standardize the 'Chauffage' column and fill NaN with 'Plinthes électriques'
+    df_cleaned['Chauffage'] = (
+        df_cleaned['Chauffage']
+        .apply(lambda x: ', '.join([map_heating.get(item.strip().lower(), item.strip()) for item in x.split(',')]) if pd.notna(x) else 'Plinthes électriques')
+    )
+
     # Apply custom functions
     df_cleaned['year_built'] = df_cleaned['YearBuilt'].apply(extract_year)
     df_cleaned['living_area'] = df_cleaned.apply(extract_living_area, axis=1)
     df_cleaned['yard_area'] = df_cleaned.apply(extract_yard_area, axis=1)
     df_cleaned[['has_certificate', 'year_certificate', 'due_certificate']] = df_cleaned['Cert. de localisation'].apply(extract_certificate_info)
     df_cleaned[['near_water', 'water_name']] = df_cleaned['Plan d\'eau'].apply(standardize_water)
+    df_cleaned[['has_pool', 'pool_type']] = df_cleaned['Piscine'].apply(standardize_pool)
+    df_cleaned['total_parking'] = df_cleaned['Stationnement (total)'].apply(total_parking)
 
     # Drop rows where certain columns are NaN
     df_cleaned = df_cleaned.dropna(subset=['year_built', 'living_area', 'yard_area'])
     
-    """ 
     # Cast to appropriate data types
-    df_cleaned['near_water'] = df_cleaned['near_water'].astype(int)
-    # Convert 'year_built' to integer
     df_cleaned['year_built'] = df_cleaned['year_built'].astype(int)
-    """
+    df_cleaned['near_water'] = df_cleaned['near_water'].astype(int)
+    df_cleaned['has_pool'] = df_cleaned['has_pool'].astype(int)
+   
+
     return df_cleaned
 
 def feature_engineering(df):
-    # Feature engineering steps here
-    return df
+    
+    df_engineered = df.copy()
+
+    # List of unique heating types you want to consider
+    unique_heating_types = ['Plinthes électriques', 'Convecteurs', 'Eau chaude', 'Air soufflé (pulsé)', 'Radiant', 'Thermopompe', 'Gaz naturel', 'Poêle à bois', 'Foyer au gaz']
+
+    # Create new columns for each heating type
+    for heating_type in unique_heating_types:
+        df_engineered[heating_type] = df_engineered['Chauffage'].apply(lambda x: 1 if heating_type.lower() in x.lower() else 0)
+
+
+
+    return df_engineered
