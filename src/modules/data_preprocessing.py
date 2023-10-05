@@ -10,9 +10,9 @@ import re
 from datetime import datetime
 
 def clean_data(df):
-
+    df_cleaned = df.copy()
     # Column naming
-    df.rename(columns={
+    df_cleaned.rename(columns={
         'Prix': 'price',
         'Un. rés.': 'units',
         'Rev. brut. pot.': 'income',
@@ -29,24 +29,16 @@ def clean_data(df):
 
     # Datatypes
     for col in ['price', 'income', 'build_eval', 'land_eval']:
-        df[col] = df[col].str.replace('[\$, ]', '', regex=True).fillna(0).astype(int)
+        df_cleaned[col] = df_cleaned[col].str.replace('[\$, ]', '', regex=True).fillna(0).astype(int)
 
     # Remove outliers in income
-    df = df[df['income'] >= 2000]
+    df_cleaned = df_cleaned[df_cleaned['income'] >= 2000].copy()
 
     # Extract year of construction
     def extract_year(row):
         year_match = re.search(r'\b\d{4}\b', row)
+
         return int(year_match.group()) if year_match else None
-
-    ## Extract year and create a new column
-    df['year_built'] = df['YearBuilt'].apply(extract_year)
-
-    ## Drop rows where 'year_built' is None
-    df.dropna(subset=['year_built'], inplace=True)
-
-    ## Convert 'year_built' to integer
-    df['year_built'] = df['year_built'].astype(int)
 
     # Filling missing value for living_area using building dimension
     def extract_living_area(row):
@@ -63,12 +55,6 @@ def clean_data(df):
                 return float(match[0].replace(',', '.')) * float(match[1].replace(',', '.'))
         
         return np.nan
-    
-    ## Create the 'living_area' column
-    df['living_area'] = df.apply(extract_living_area, axis=1)
-
-    ## Drop rows where 'living_area' is NaN
-    df.dropna(subset=['living_area'], inplace=True)
 
     # Filling missing value for yard_area using land dimension
     def extract_yard_area(row):
@@ -85,12 +71,6 @@ def clean_data(df):
                 return float(match[0].replace(',', '.')) * float(match[1].replace(',', '.'))
     
         return np.nan
-    
-    ## Create the 'yard_area' column
-    df['yard_area'] = df.apply(extract_yard_area, axis=1)
-
-    ## Drop rows where 'yard_area' is NaN
-    df.dropna(subset=['yard_area'], inplace=True)
 
     # Extract certificate boolean and year (and overdue status)
     def extract_certificate_info(row):
@@ -108,9 +88,6 @@ def clean_data(df):
                     due_certificate = 1
                 
         return pd.Series([has_certificate, year_certificate, due_certificate], index=['has_certificate', 'year_certificate', 'due_certificate'])
-
-    ## Create new columns
-    df[['has_certificate', 'year_certificate', 'due_certificate']] = df['Cert. de localisation'].apply(extract_certificate_info)
 
     # Standardize near water names
     standard_names = ['Fleuve St-Laurent', 'Canal de Lachine', 'Rivière des Prairies', 'Louis Veuillot', 'Municipal', 'Ville']
@@ -152,14 +129,25 @@ def clean_data(df):
                         break
                 
         return pd.Series([near_water, water_name], index=['near_water', 'water_name'])
-
-    ## Create new columns
-    df[['near_water', 'water_name']] = df['Plan d\'eau'].apply(standardize_water)
     
-    ## Cast to appropriate data types
-    df['near_water'] = df['near_water'].astype(int)
+   
+    # Apply custom functions
+    df_cleaned['year_built'] = df_cleaned['YearBuilt'].apply(extract_year)
+    df_cleaned['living_area'] = df_cleaned.apply(extract_living_area, axis=1)
+    df_cleaned['yard_area'] = df_cleaned.apply(extract_yard_area, axis=1)
+    df_cleaned[['has_certificate', 'year_certificate', 'due_certificate']] = df_cleaned['Cert. de localisation'].apply(extract_certificate_info)
+    df_cleaned[['near_water', 'water_name']] = df_cleaned['Plan d\'eau'].apply(standardize_water)
 
-    return df
+    # Drop rows where certain columns are NaN
+    df_cleaned = df_cleaned.dropna(subset=['year_built', 'living_area', 'yard_area'])
+    
+    """ 
+    # Cast to appropriate data types
+    df_cleaned['near_water'] = df_cleaned['near_water'].astype(int)
+    # Convert 'year_built' to integer
+    df_cleaned['year_built'] = df_cleaned['year_built'].astype(int)
+    """
+    return df_cleaned
 
 def feature_engineering(df):
     # Feature engineering steps here
