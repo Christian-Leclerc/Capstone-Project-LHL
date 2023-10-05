@@ -280,9 +280,9 @@ def feature_engineering(df):
 
     ## Update new columns based on 'Rénovations'
     for idx, row in df_engineered.iterrows():
-        if pd.notna(row['Rénovations']):
+        if pd.notna(row['rénovations']):
             df_engineered.loc[idx, 'has_reno'] = 1
-            years = [int(year) for year in re.findall(r'\b\d{4}\b', row['Rénovations'])]
+            years = [int(year) for year in re.findall(r'\b\d{4}\b', row['rénovations'])]
             if years:
                 df_engineered.loc[idx, 'last_year_reno'] = max(years)
 
