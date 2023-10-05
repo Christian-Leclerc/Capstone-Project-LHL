@@ -26,7 +26,8 @@ def clean_data(df):
         'Exclusions': 'exclusions',
         'Addenda': 'addenda',
         'Nbre pièces': 'rooms',
-        'Nbre chambres (hors-sol + sous-sol)': 'bedrooms'
+        'Nbre chambres (hors-sol + sous-sol)': 'bedrooms',
+        "Nbre salles de bains + salles d'eau": 'washrooms'
     }, inplace=True)
 
     # Datatypes
@@ -190,6 +191,9 @@ def clean_data(df):
         df_cleaned['Chauffage']
         .apply(lambda x: ', '.join([map_heating.get(item.strip().lower(), item.strip()) for item in x.split(',')]) if pd.notna(x) else 'Plinthes électriques')
     )
+
+    # Total washrooms
+    df_cleaned['washrooms'] = df_cleaned['washrooms'].apply(lambda x: sum(int(item) for item in x.split('+')) if pd.notna(x) else 0)
 
     # Apply custom functions
     df_cleaned['year_built'] = df_cleaned['YearBuilt'].apply(extract_year)
