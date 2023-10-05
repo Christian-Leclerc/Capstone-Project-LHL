@@ -9,6 +9,7 @@ from math import sqrt
 import re
 from datetime import datetime
 
+# Mix of cleaning and feature engineering
 def clean_data(df):
     df_cleaned = df.copy()
     # Column naming
@@ -24,7 +25,8 @@ def clean_data(df):
         'Inclusions': 'inclusions',
         'Exclusions': 'exclusions',
         'Addenda': 'addenda',
-        'Nbre pièces': 'rooms'
+        'Nbre pièces': 'rooms',
+        'Nbre chambres (hors-sol + sous-sol)': 'bedrooms'
     }, inplace=True)
 
     # Datatypes
@@ -209,6 +211,8 @@ def clean_data(df):
 
     return df_cleaned
 
+
+# New features
 def feature_engineering(df):
     
     df_engineered = df.copy()
@@ -220,6 +224,65 @@ def feature_engineering(df):
     for heating_type in unique_heating_types:
         df_engineered[heating_type] = df_engineered['Chauffage'].apply(lambda x: 1 if heating_type.lower() in x.lower() else 0)
 
+    # Water_access boolean
+    df_engineered['water_access'] = df_engineered['Eau (accès)'].apply(lambda x: 1 if pd.notna(x) and x != 'Non navigable' else 0)
 
+    # Fireplace boolean and condition
+    df_engineered['has_fireplace'] = df_engineered['Foyers-Poêles'].apply(lambda x: 0 if pd.isna(x) else 1)
+    df_engineered['fireplace_func'] = df_engineered['Foyers-Poêles'].apply(lambda x: 0 if pd.isna(x) else (0 if 'non' in x.lower() else 1))
+
+    # Services
+    custom_services = ['Porte de garage électrique', 'Buanderie', 'Climatiseur', 'Aspirateur centrale' , 'Spa', "Détecteur d'incendie(relié)", 
+                       "Détecteur d'incendie(non relié)", 'Adapté pour personne à mobilité réduite', 'Interphone', 'Fournaise', 'Thermopompe', 
+                       'Planchers chauffant', 'Ascenseur', "Échangeur d'air", 'Fournaise', "Système d'alarme",'Borne de recharge']
+    
+    keyword_mapping = {
+        'garage': 'Porte de garage électrique',
+        'climatiseur': 'Climatiseur',
+        'climatisation': 'Climatiseur',
+        'buanderie': 'Buanderie',
+        'aspirateur': 'Aspirateur centrale',
+        'thermo': 'Thermopompe',
+        'thermopompe': 'Thermopompe',
+        'planchers chauffant': 'Planchers chauffant',
+        'fournaise': 'Fournaise',
+        'spa': 'Spa',
+        'ascenseur(s)': 'Ascenseur',
+        'borne': 'Borne de recharge',
+
+    }
+
+    ## Initialize new columns with zeros
+    for service in custom_services:
+        df_engineered[service] = 0
+
+    def populate_service_columns(row):
+        if pd.notna(row):
+            for service in row.split(','):
+                service_stripped = service.strip()
+                # Check for exact match first
+                if service_stripped in custom_services:
+                    df_engineered.loc[df_engineered['Équip./Serv.'] == row, service_stripped] = 1
+                else:
+                    # Check for keyword match
+                    for keyword, mapped_service in keyword_mapping.items():
+                        if keyword in service_stripped.lower():
+                            df_engineered.loc[df_engineered['Équip./Serv.'] == row, mapped_service] = 1
+    # Renovations
+
+    ## Initialize new columns
+    df_engineered['has_reno'] = 0
+    df_engineered['last_year_reno'] = 0  # Initialize with zeros instead of np.nan
+
+    ## Update new columns based on 'Rénovations'
+    for idx, row in df.iterrows():
+        if pd.notna(row['Rénovations']):
+            df_engineered.loc[idx, 'has_reno'] = 1
+            years = [int(year) for year in re.findall(r'\b\d{4}\b', row['Rénovations'])]
+            if years:
+                df_engineered.loc[idx, 'last_year_reno'] = max(years)
+
+    # Apply functions
+    df_engineered['Équip./Serv.'].apply(populate_service_columns)
 
     return df_engineered
