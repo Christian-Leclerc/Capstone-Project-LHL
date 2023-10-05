@@ -64,6 +64,9 @@ def clean_data(df):
         
         return np.nan
     
+    ## Create the 'living_area' column
+    df['living_area'] = df.apply(extract_living_area, axis=1)
+
     ## Drop rows where 'living_area' is NaN
     df.dropna(subset=['living_area'], inplace=True)
 
@@ -82,6 +85,9 @@ def clean_data(df):
                 return float(match[0].replace(',', '.')) * float(match[1].replace(',', '.'))
     
         return np.nan
+    
+    ## Create the 'yard_area' column
+    df['yard_area'] = df.apply(extract_yard_area, axis=1)
 
     ## Drop rows where 'yard_area' is NaN
     df.dropna(subset=['yard_area'], inplace=True)
@@ -153,8 +159,8 @@ def clean_data(df):
     ## Cast to appropriate data types
     df['near_water'] = df['near_water'].astype(int)
 
-    return df_cleaned
+    return df
 
 def feature_engineering(df):
     # Feature engineering steps here
-    return df_engineered
+    return df
