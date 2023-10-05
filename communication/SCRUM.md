@@ -23,9 +23,21 @@
 **T:** Finalizing raw data extraction. Re-doing EDA and starting modeling.
 **R:** No issue, except time...
 **W:** Raw data complete.
-**%:** Data acquisition (100%), EDA (50%), Overall(20%)
+**%:** Data acquisition (100%), EDA (50%), Overall (20%)
 
+## W17D3
+**T:** Continuing on cleaning data.
+**R:** Been sick for 2 days. Had to descope my project. Less WOW, but still MVP.
+**W:** New plan is feasible. On track.
+**%:** EDA(75%), Overall (25%)
+
+## W17D4
+**T:** Finishing cleaning, need to finish modelling today.
+**R:** Missing some data for geo localization of houses. Will need to scrape google API or abandon the idea.
+**W:** Feeling good. Back on track.
+**%:** Coming later today.
 ## WxxDx
+
 **T:** /
 **R:** /
 **W:** /
