@@ -205,7 +205,7 @@ def clean_data(df):
     df_cleaned['total_parking'] = df_cleaned['Stationnement (total)'].apply(total_parking)
 
     # Drop rows where certain columns are NaN
-    df_cleaned = df_cleaned.dropna(subset=['year_built', 'living_area', 'yard_area'])
+    df_cleaned = df_cleaned.dropna(subset=['year_built', 'living_area', 'yard_area', 'rooms'])
     
     # Cast to appropriate data types
     df_cleaned['year_built'] = df_cleaned['year_built'].astype(int)
@@ -288,5 +288,9 @@ def feature_engineering(df):
 
     # Apply functions
     df_engineered['Équip./Serv.'].apply(populate_service_columns)
+
+    # Create house ages based on year_built
+    current_year = datetime.now().year
+    df_engineered['build_age'] = df_engineered['year_built'].apply(lambda x: current_year - x)
 
     return df_engineered
