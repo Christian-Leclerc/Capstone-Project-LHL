@@ -209,14 +209,13 @@ def clean_data(df):
                         (df_cleaned['land_eval'] < 600000) | 
                         (df_cleaned['build_eval'] < 800000) |
                         (df_cleaned['yard_area'] < 6000) |
-                        (df_cleaned['total_parking'] <= 5)].copy()
+                        (df_cleaned['total_parking'] <= 5)]
 
     # Cast to appropriate data types
     df_cleaned['year_built'] = df_cleaned['year_built'].astype(int)
     df_cleaned['near_water'] = df_cleaned['near_water'].astype(int)
     df_cleaned['has_pool'] = df_cleaned['has_pool'].astype(int)
    
-
     return df_cleaned
 
 
