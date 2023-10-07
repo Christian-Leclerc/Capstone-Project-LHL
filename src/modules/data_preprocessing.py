@@ -286,6 +286,20 @@ def feature_engineering(df):
             if years:
                 df_engineered.loc[idx, 'last_year_reno'] = max(years)
 
+    # Average, Min, Max of prices per District
+    ## Calculate min, mean, and max prices for each District
+    district_stats = df_engineered.groupby('District')['price'].agg(['min', 'mean', 'max']).reset_index()
+    
+    ## Rename columns for merging
+    district_stats.columns = ['District', 'min_price', 'mean_price', 'max_price']
+    
+    ## Merge the stats back into the original dataframe
+    df_engineered = df_engineered.merge(district_stats, on='District', how='left')
+
+    # Re-cast min_price and max_price to integers
+    df_engineered['min_price'] = df_engineered['min_price'].astype(int)
+    df_engineered['max_price'] = df_engineered['max_price'].astype(int)
+
     # Apply functions
     df_engineered['Équip./Serv.'].apply(populate_service_columns)
 
