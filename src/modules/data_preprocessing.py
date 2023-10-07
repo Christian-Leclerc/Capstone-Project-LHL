@@ -55,7 +55,7 @@ def clean_data(df):
         if pd.notna(row['Dimensions du bâtiment']):
             match = re.findall(r'(\d+,\d+|\d+)', row['Dimensions du bâtiment'].split('/')[0])
             if len(match) >= 2:
-                return float(match[0].replace(',', '.')) * float(match[1].replace(',', '.') * row['units'])
+                return float(match[0].replace(',', '.')) * float(match[1].replace(',', '.')) * row['units']
         
         return np.nan
 
