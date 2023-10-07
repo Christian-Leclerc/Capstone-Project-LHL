@@ -1,7 +1,12 @@
+import pandas as pd
 import numpy as np
 from sklearn.preprocessing import StandardScaler
 from sklearn.manifold import TSNE
 from sklearn.cluster import KMeans
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import classification_report
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
 import matplotlib.pyplot as plt
 
 def TSNE_kMeans_figure(quantitatives):
@@ -58,12 +63,46 @@ def TSNE_kMeans_figure(quantitatives):
 
     # Add labels
     plt.text(-50, 45, 'Average:Less parking and yard, Older', color='black', ha='left')  # Adjust the x and y values as needed
-    plt.text(-50, -45, 'Avergae: More parking and yard, Younger', color='black', ha='left')  # Adjust the x and y values as needed
+    plt.text(-50, -45, 'Average: More parking and yard, Younger', color='black', ha='left')  # Adjust the x and y values as needed
 
 
     plt.title('t-SNE with KMeans Clusters')
     plt.xlabel('t-SNE feature 1')
     plt.ylabel('t-SNE feature 2')
+    plt.show()
+
+
+def random_forest_features(quantitatives):
+    # Prepare data for Random Forest Classifier
+    X = quantitatives.drop(columns=['cluster_label'])
+    y = quantitatives['cluster_label']
+
+    # split test
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+
+    # train model
+    clf = RandomForestClassifier(n_estimators=100, random_state=42)
+    clf.fit(X_train, y_train)
+
+    # Evaluate test
+    y_pred = clf.predict(X_test)
+
+    # Feature importance
+    importances = clf.feature_importances_
+    features = X.columns
+    importance_df = pd.DataFrame({'Feature': features, 'Importance': importances}).sort_values(by='Importance', ascending=False)
+
+    # Visualize
+    plt.figure(figsize=(12,8))
+
+    importance_df.set_index('Feature').sort_values(by='Importance').plot(kind='barh', legend=False)
+
+    plt.title('Feature Importances from Random Forest')
+    plt.xlabel('Importance')
+    plt.ylabel('Feature')
+    
+
+    print(classification_report(y_test, y_pred))
     plt.show()
 
     
