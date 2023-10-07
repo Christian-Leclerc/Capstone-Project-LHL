@@ -205,10 +205,10 @@ def clean_data(df):
     df_cleaned = df_cleaned.dropna(subset=['year_built', 'living_area', 'yard_area', 'rooms'])
     
     # Remove outliers
-    df_cleaned = df_cleaned[(df_cleaned['income'] >= 2000) | 
-                        (df_cleaned['land_eval'] < 600000) | 
-                        (df_cleaned['build_eval'] < 800000) |
-                        (df_cleaned['yard_area'] < 6000) |
+    df_cleaned = df_cleaned[(df_cleaned['income'] >= 2000) & 
+                        (df_cleaned['land_eval'] < 600000) & 
+                        (df_cleaned['build_eval'] < 800000) &
+                        (df_cleaned['yard_area'] < 6000) &
                         (df_cleaned['total_parking'] <= 5)]
 
     # Cast to appropriate data types

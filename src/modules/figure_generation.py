@@ -35,11 +35,11 @@ def TSNE_kMeans_figure(quantitatives):
 
     # Define cluster names/features
     cluster_features = [
-        ['Triplex'],
         ['Duplex'],
         ['Duplex'],
+        ['Triplex++'],
         ['Triplex'],
-        ['Triplex++']
+        ['Triplex']
     ]
 
     # Visualize
@@ -58,12 +58,14 @@ def TSNE_kMeans_figure(quantitatives):
             offset = j * 3.5
             plt.text(c[0], c[1]-offset, feature, fontsize=10, ha='center', va='center', bbox=dict(facecolor='white', alpha=1.0, edgecolor='black'))
 
-    # Add horizontal line
-    plt.axhline(-7, color='red', linestyle='--')  # Red dashed line at t-SNE = 0
+    ## Add horizontal line
+    #plt.axhline(-7, color='red', linestyle='--')  # Red dashed line at t-SNE = 0
+    # Add a line split
+    plt.plot([-50, 50], [-38, 18], color='red', linestyle='--')
 
     # Add labels
-    plt.text(-50, 45, 'Average:Less parking and yard, Older', color='black', ha='left')  # Adjust the x and y values as needed
-    plt.text(-50, -45, 'Average: More parking and yard, Younger', color='black', ha='left')  # Adjust the x and y values as needed
+    plt.text(-54, 47, 'Average:Less parking and yard, Older', color='black', ha='left')  # Adjust the x and y values as needed
+    plt.text(0, -48, 'Average: More parking and yard, Younger', color='black', ha='left')  # Adjust the x and y values as needed
 
 
     plt.title('t-SNE with KMeans Clusters')
