@@ -236,8 +236,8 @@ def feature_engineering(df):
     df_engineered['fireplace_func'] = df_engineered['Foyers-Poêles'].apply(lambda x: 0 if pd.isna(x) else (0 if 'non' in x.lower() else 1))
 
     # Services
-    custom_services = ['Porte de garage électrique', 'Buanderie', 'Climatiseur', 'Aspirateur centrale' , 'Spa', "Détecteur d'incendie(relié)", 
-                       "Détecteur d'incendie(non relié)", 'Adapté pour personne à mobilité réduite', 'Interphone', 'Fournaise', 'Thermopompe', 
+    custom_services = ['Porte de garage électrique', 'Buanderie', 'Climatiseur', 'Aspirateur centrale' , 'Spa', "Détecteur d'incendie (relié)", 
+                       "Détecteur d'incendie (non relié)", 'Adapté pour personne à mobilité réduite', 'Interphone', 'Fournaise', 'Thermopompe', 
                        'Planchers chauffant', 'Ascenseur', "Échangeur d'air", 'Fournaise', "Système d'alarme",'Borne de recharge']
     
     keyword_mapping = {
