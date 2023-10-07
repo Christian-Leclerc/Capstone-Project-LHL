@@ -55,7 +55,7 @@ def clean_data(df):
         if pd.notna(row['Dimensions du bâtiment']):
             match = re.findall(r'(\d+,\d+|\d+)', row['Dimensions du bâtiment'].split('/')[0])
             if len(match) >= 2:
-                return float(match[0].replace(',', '.')) * float(match[1].replace(',', '.'))
+                return float(match[0].replace(',', '.')) * float(match[1].replace(',', '.') * row['units'])
         
         return np.nan
 
@@ -92,7 +92,7 @@ def clean_data(df):
                 
         return pd.Series([has_certificate, year_certificate, due_certificate], index=['has_certificate', 'year_certificate', 'due_certificate'])
 
-    ## Mapping of similar or translated terms to standard names
+    ## Mapping of similar or translated terms to standard names for water
     map_water = {
         'fleuve st-laurent': 'Fleuve St-Laurent',
         'st-lawrence river': 'Fleuve St-Laurent',
@@ -221,7 +221,7 @@ def feature_engineering(df):
     
     df_engineered = df.copy()
 
-    # List of unique heating types you want to consider
+    # List of unique heating types
     unique_heating_types = ['Plinthes électriques', 'Convecteurs', 'Eau chaude', 'Air soufflé (pulsé)', 'Radiant', 'Thermopompe', 'Gaz naturel', 'Poêle à bois', 'Foyer au gaz']
 
     # Create new columns for each heating type
