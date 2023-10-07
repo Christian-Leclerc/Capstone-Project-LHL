@@ -34,9 +34,6 @@ def clean_data(df):
     for col in ['price', 'income', 'build_eval', 'land_eval']:
         df_cleaned[col] = df_cleaned[col].str.replace('[\$, ]', '', regex=True).fillna(0).astype(int)
 
-    # Remove outliers in income
-    df_cleaned = df_cleaned[df_cleaned['income'] >= 2000].copy()
-
     # Extract year of construction
     def extract_year(row):
         year_match = re.search(r'\b\d{4}\b', row)
@@ -207,6 +204,13 @@ def clean_data(df):
     # Drop rows where certain columns are NaN
     df_cleaned = df_cleaned.dropna(subset=['year_built', 'living_area', 'yard_area', 'rooms'])
     
+    # Remove outliers
+    df_cleaned = df_cleaned[(df_cleaned['income'] >= 2000) | 
+                        (df_cleaned['land_eval'] < 600000) | 
+                        (df_cleaned['build_eval'] < 800000) |
+                        (df_cleaned['yard_area'] < 6000) |
+                        (df_cleaned['total_parking'] <= 5)].copy()
+
     # Cast to appropriate data types
     df_cleaned['year_built'] = df_cleaned['year_built'].astype(int)
     df_cleaned['near_water'] = df_cleaned['near_water'].astype(int)
