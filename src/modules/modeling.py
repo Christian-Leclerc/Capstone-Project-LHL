@@ -5,6 +5,7 @@ from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.preprocessing import StandardScaler
+from joblib import dump, load
 
 def train_linear_regression(X, y):
     regressor = LinearRegression()
@@ -40,8 +41,6 @@ def feature_selection(X, y, significance_level=0.05):
 def main(df):
 
     X = df.drop('price', axis=1)
-
-
     y = df['price']
 
     # Splitting dataset into train and test
@@ -68,11 +67,18 @@ def main(df):
     # Calculate the difference between actual and predicted prices
     residuals = (df['price'] - predictions).astype(int)
 
-    # Return the original dataframe with appended predictions, residuals and the model
-    return df.assign(Predicted_Price=predictions, Residuals=residuals), regressor
+    # Saving trained model and scaler
+    dump(regressor, 'trained_model.joblib')
+    dump(scaler, 'trained_scaler.joblib')
 
-def predict_price(listings, model, scaler):
-    
+    # Return the original dataframe with appended predictions, residuals and the model
+    return df.assign(Predicted_Price=predictions, Residuals=residuals)
+
+def predict_price(listings):
+    # Load the trained model from the file
+    model = load('trained_model.joblib')
+    scaler = load('trained_scaler.joblib')
+
     # Select predominant features
     X = listings[['units', 'income', 'build_eval', 'yard_area', 'mean_price', 'build_age']].copy()
 

@@ -1,11 +1,5 @@
-from modules.data_loading import load_train_data, load_listings_data
 import pandas as pd
 import numpy as np
-import ydata_profiling
-from sklearn.linear_model import LinearRegression
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import mean_absolute_error, mean_squared_error
-from math import sqrt
 import re
 from datetime import datetime
 
@@ -30,6 +24,8 @@ def clean_data(df):
         "Nbre salles de bains + salles d'eau": 'washrooms'
     }, inplace=True)
 
+    print(df_cleaned.columns)
+    
     # Datatypes
     for col in ['price', 'income', 'build_eval', 'land_eval']:
         #df_cleaned[col] = df_cleaned[col].str.replace('[\$, ]', '', regex=True).fillna(0).astype(int)
@@ -204,13 +200,6 @@ def clean_data(df):
 
     # Drop rows where certain columns are NaN
     df_cleaned = df_cleaned.dropna(subset=['year_built', 'living_area', 'yard_area', 'rooms'])
-    
-    # Remove outliers
-    df_cleaned = df_cleaned[(df_cleaned['income'] >= 2000) & 
-                        (df_cleaned['land_eval'] < 600000) & 
-                        (df_cleaned['build_eval'] < 800000) &
-                        (df_cleaned['yard_area'] < 6000) &
-                        (df_cleaned['total_parking'] <= 5)]
 
     # Cast to appropriate data types
     df_cleaned['year_built'] = df_cleaned['year_built'].astype(int)
