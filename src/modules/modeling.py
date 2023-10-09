@@ -4,6 +4,7 @@ import statsmodels.api as sm
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.preprocessing import StandardScaler
 
 def train_linear_regression(X, y):
     regressor = LinearRegression()
@@ -30,14 +31,14 @@ def feature_selection(X, y, significance_level=0.05):
     X_with_constant = sm.add_constant(X)
     
     regressor_OLS = sm.OLS(y, X_with_constant).fit()
-    max_p_value = max(regressor_OLS.pvalues)
+    #max_p_value = max(regressor_OLS.pvalues)
     
-    while max_p_value > significance_level:
-        drop_column = regressor_OLS.pvalues.idxmax()  # Get the feature with the highest p-value
-        X_with_constant = X_with_constant.drop(columns=[drop_column])  # Drop this feature
+    #while max_p_value > significance_level:
+    #    drop_column = regressor_OLS.pvalues.idxmax()  # Get the feature with the highest p-value
+    #    X_with_constant = X_with_constant.drop(columns=[drop_column])  # Drop this feature
         
-        regressor_OLS = sm.OLS(y, X_with_constant).fit()
-        max_p_value = max(regressor_OLS.pvalues)  # Re-compute the highest p-value
+   #     regressor_OLS = sm.OLS(y, X_with_constant).fit()
+   #     max_p_value = max(regressor_OLS.pvalues)  # Re-compute the highest p-value
     
     # After the loop, print the summary of the final model
     print(regressor_OLS.summary())
@@ -54,19 +55,34 @@ def main(df):
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
     # Feature selection
-    X_train_selected = feature_selection(X_train, y_train)
+    X_train = feature_selection(X_train, y_train)
+    
+    # Keep the names of selected features to be used for X_test
+    #selected_features = X_train.columns
+
+    # Make sure to only select the same features for X_test
+    #X_test = X_test[selected_features]
+
+    # Feature scaling
+    scaler = StandardScaler()
+    X_train = scaler.fit_transform(X_train)
+    X_test = scaler.transform(X_test)
 
     # Train the model using the training set
-    regressor = train_linear_regression(X_train_selected, y_train)
+    regressor = train_linear_regression(X_train, y_train)
 
     # Evaluate the model using the test set
-    evaluate_model(regressor, X_test[X_train_selected.columns], y_test)
+    evaluate_model(regressor, X_test, y_test)
     
     # Generate predictions for the entire dataset
-    predictions = regressor.predict(df[X_train_selected.columns])
+    X_all = scaler.transform(X)  # Scale the entire dataset
+    predictions = regressor.predict(X_all).astype(int) 
+    
+    # Generate predictions for the entire dataset
+    #predictions = regressor.predict(scaler.transform(df[selected_features])).astype(int)
 
     # Calculate the difference between actual and predicted prices
-    residuals = df['price'] - predictions
+    residuals = (df['price'] - predictions).astype(int)
 
     # Return the original dataframe with appended predictions and residuals
     return df.assign(Predicted_Price=predictions, Residuals=residuals)
