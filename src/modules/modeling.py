@@ -31,16 +31,7 @@ def feature_selection(X, y, significance_level=0.05):
     X_with_constant = sm.add_constant(X)
     
     regressor_OLS = sm.OLS(y, X_with_constant).fit()
-    #max_p_value = max(regressor_OLS.pvalues)
     
-    #while max_p_value > significance_level:
-    #    drop_column = regressor_OLS.pvalues.idxmax()  # Get the feature with the highest p-value
-    #    X_with_constant = X_with_constant.drop(columns=[drop_column])  # Drop this feature
-        
-   #     regressor_OLS = sm.OLS(y, X_with_constant).fit()
-   #     max_p_value = max(regressor_OLS.pvalues)  # Re-compute the highest p-value
-    
-    # After the loop, print the summary of the final model
     print(regressor_OLS.summary())
     
     # Drop the constant column and return the selected features
@@ -49,6 +40,8 @@ def feature_selection(X, y, significance_level=0.05):
 def main(df):
 
     X = df.drop('price', axis=1)
+
+
     y = df['price']
 
     # Splitting dataset into train and test
@@ -57,12 +50,6 @@ def main(df):
     # Feature selection
     X_train = feature_selection(X_train, y_train)
     
-    # Keep the names of selected features to be used for X_test
-    #selected_features = X_train.columns
-
-    # Make sure to only select the same features for X_test
-    #X_test = X_test[selected_features]
-
     # Feature scaling
     scaler = StandardScaler()
     X_train = scaler.fit_transform(X_train)
@@ -77,12 +64,25 @@ def main(df):
     # Generate predictions for the entire dataset
     X_all = scaler.transform(X)  # Scale the entire dataset
     predictions = regressor.predict(X_all).astype(int) 
-    
-    # Generate predictions for the entire dataset
-    #predictions = regressor.predict(scaler.transform(df[selected_features])).astype(int)
 
     # Calculate the difference between actual and predicted prices
     residuals = (df['price'] - predictions).astype(int)
 
-    # Return the original dataframe with appended predictions and residuals
-    return df.assign(Predicted_Price=predictions, Residuals=residuals)
+    # Return the original dataframe with appended predictions, residuals and the model
+    return df.assign(Predicted_Price=predictions, Residuals=residuals), regressor
+
+def predict_price(listings, model, scaler):
+    
+    # Select predominant features
+    X = listings[['units', 'income', 'build_eval', 'yard_area', 'mean_price', 'build_age']].copy()
+
+   # Scaling the new data
+    X_scaled = scaler.transform(X)
+
+    # Predict price with trained model
+    predicted_prices = model.predict(X_scaled)
+
+    # Caluclate residuals
+    residuals = listings['price'] - predicted_prices
+
+    return listings.assign(Predicted_Price=predicted_prices, Residuals=residuals)

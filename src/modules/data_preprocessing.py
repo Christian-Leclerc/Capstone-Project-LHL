@@ -1,4 +1,4 @@
-from modules.data_loading import load_train_data, load_test_data
+from modules.data_loading import load_train_data, load_listings_data
 import pandas as pd
 import numpy as np
 import ydata_profiling
@@ -32,7 +32,8 @@ def clean_data(df):
 
     # Datatypes
     for col in ['price', 'income', 'build_eval', 'land_eval']:
-        df_cleaned[col] = df_cleaned[col].str.replace('[\$, ]', '', regex=True).fillna(0).astype(int)
+        #df_cleaned[col] = df_cleaned[col].str.replace('[\$, ]', '', regex=True).fillna(0).astype(int)
+        df_cleaned[col] = df_cleaned[col].str.replace('[\$, ]', '', regex=True).str.split('+').str[0].fillna(0).astype(int)
 
     # Extract year of construction
     def extract_year(row):
