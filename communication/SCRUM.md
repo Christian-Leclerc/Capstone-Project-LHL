@@ -36,9 +36,9 @@
 **R:** Missing some data for geo localization of houses. Will need to scrape google API or abandon the idea.
 **W:** Feeling good. Back on track.
 **%:** Coming later today.
-## WxxDx
 
-**T:** /
-**R:** /
-**W:** /
-**%:** /
+## W18D1
+**T:** Finalizing presentation and dashboard fine-tuning
+**R:** Had to descope again, figured out too late that it is more a Machine learning / Web application project... ;)
+**W:** Learned a lot about machine learning tool, thought lack practice
+**%:** EDA (100%), Modelling (100%), Dashboard/Presentation (50%), Overall (80%)
