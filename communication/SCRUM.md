@@ -42,3 +42,7 @@
 **R:** Had to descope again, figured out too late that it is more a Machine learning / Web application project... ;)
 **W:** Learned a lot about machine learning tool, thought lack practice
 **%:** EDA (100%), Modelling (100%), Dashboard/Presentation (50%), Overall (80%)
+
+## W18D3
+
+# Ready for DEMO DAY!!! (100%)
