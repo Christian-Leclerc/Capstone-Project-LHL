@@ -46,7 +46,8 @@ It resulted with a model with an accuracy of 35%, and a deviation of 70,000$. It
 
 # Result
 
-**Dashboard**<br>
+**Dashboard**
+
 After applying the model to a new unseen listings from actual Plex beeing on the market from a specific location (Ahuntsic), I imported the result in Tableau Destop to create a Dashboard to represent my idea of an application.
 ![Dashboard](/output/figures/Dashboard.png)
 
