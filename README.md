@@ -32,7 +32,7 @@ After investigating the clusters, it was clear that the type of Plex (or number 
 2. The Yard area (or land area)
 3. Total of parkings
 
-The more younger were the Plex the less total parking and yard area (shown by the red dashed line). Thought, using correlation technique, I figured out that Yard area and Totla parking were highly correlated, so I had to eliminate one of them in the final selection.
+The more younger were the Plex the less total parking and yard area (shown by the red dashed line). Thought, using correlation technique, I figured out that Yard area and Total parking were highly correlated, so I had to eliminate one of them in the final selection.
 
 To understand the importance of the features, I used Random Forest Classifier.
 
